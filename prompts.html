@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON CATALOG · Промпты</title>
+    <style>
+        /* БАЗОВЫЕ СТИЛИ */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        
+        /* ЦВЕТА ДЛЯ ТЕМНОЙ ТЕМЫ */
+        :root { --bg-color: #0b0e1a; --card-bg: rgba(18, 25, 40, 0.55); --text-main: #eaeef2; --text-muted: #9aa9c0; --border: rgba(0, 255, 200, 0.25); --accent: #00ffc3; }
+        
+        /* ЦВЕТА ДЛЯ МЯГКОЙ СВЕТЛОЙ ТЕМЫ */
+        body.light-theme { --bg-color: #e8ecef; --card-bg: rgba(255, 255, 255, 0.95); --text-main: #2d3748; --text-muted: #4a5568; --border: rgba(0, 180, 140, 0.3); }
+        
+        body { background: var(--bg-color); background-image: radial-gradient(circle at 20% 30%, rgba(0, 255, 200, 0.05) 0%, transparent 30%), radial-gradient(circle at 80% 70%, rgba(180, 0, 255, 0.05) 0%, transparent 35%); min-height: 100vh; display: flex; flex-direction: column; color: var(--text-main); padding: 2rem 1.5rem; position: relative; transition: background 0.3s ease, color 0.3s ease; }
+        body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(0, 255, 200, 0.1), transparent 40%), radial-gradient(circle at 70% 80%, rgba(255, 0, 200, 0.1), transparent 40%); pointer-events: none; z-index: 0; }
+        .wrapper { max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+        header { text-align: center; margin-bottom: 3rem; animation: fadeSlide 0.8s ease-out; }
+        h1 { font-size: clamp(2.4rem, 8vw, 4rem); font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, #00ffc3, #4d6aff, #b300ff, #ff3b6f); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 30px rgba(0, 255, 200, 0.3); margin-bottom: 0.75rem; line-height: 1.2; }
+        .tagline { font-size: 1.2rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; backdrop-filter: blur(2px); display: inline-block; padding: 0.3rem 1.5rem; border-radius: 60px; border: 1px solid rgba(0, 255, 200, 0.2); background: rgba(10, 20, 30, 0.4); box-shadow: 0 0 15px rgba(0, 255, 200, 0.1); margin-bottom: 2rem; transition: all 0.3s ease; }
+        body.light-theme .tagline { background: rgba(255, 255, 255, 0.6); border-color: rgba(0, 180, 140, 0.3); }
+        
+        .nav-menu { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .nav-link { color: var(--text-main); text-decoration: none; font-size: 1.1rem; font-weight: 600; padding: 0.6rem 1.5rem; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); transition: all 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #0b0e1a; background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 200, 0.4); }
+        body.light-theme .nav-link { border-color: rgba(0, 0, 0, 0.1); background: rgba(0, 0, 0, 0.05); }
+        body.light-theme .nav-link.active { color: #ffffff; background: #00b38a; border-color: #00b38a; }
+        
+        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .card { background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 2rem; padding: 2rem 1.5rem; border: 1.5px solid var(--border); box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 255, 200, 0.1) inset, 0 0 30px rgba(0, 200, 255, 0.1); transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.25s ease, box-shadow 0.3s ease, background 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; position: relative; overflow: hidden; opacity: 0; animation: cardAppear 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; will-change: transform; }
+        body.light-theme .card { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 180, 140, 0.15) inset; border: 1.5px solid rgba(0, 0, 0, 0.15); }
+        body.light-theme .card:hover { background: #ffffff; border-color: #00b38a; box-shadow: 0 20px 40px -10px rgba(0, 180, 140, 0.3), 0 0 0 1.5px #00b38a inset; }
+        
+        .card:nth-child(1) { border-image: linear-gradient(145deg, #00ffc3, #4d6aff) 1; border-image-slice: 1; }
+        .card:nth-child(2) { border-image: linear-gradient(145deg, #b300ff, #ff3b6f) 1; border-image-slice: 1; }
+        .card:nth-child(3) { border-image: linear-gradient(145deg, #ff3b6f, #4d6aff) 1; border-image-slice: 1; }
+        .card:nth-child(4) { border-image: linear-gradient(145deg, #00ffc3, #b300ff) 1; border-image-slice: 1; }
+        .card:nth-child(5) { border-image: linear-gradient(145deg, #4d6aff, #ff3b6f) 1; border-image-slice: 1; }
+        .card:nth-child(6) { border-image: linear-gradient(145deg, #b300ff, #00ffc3) 1; border-image-slice: 1; }
+        .card:nth-child(7) { border-image: linear-gradient(145deg, #ff3b6f, #00ffc3) 1; border-image-slice: 1; }
+        .card:nth-child(8) { border-image: linear-gradient(145deg, #4d6aff, #b300ff) 1; border-image-slice: 1; }
+        
+        .card:not(:nth-child(9)):hover { transform: translateY(-10px) scale(1.02); background: rgba(20, 30, 50, 0.75); }
+        body.light-theme .card:not(:nth-child(9)):hover { background: #ffffff; }
+        
+        .card:nth-child(1):hover, .card:nth-child(4):hover { border-color: #00ffc3; box-shadow: 0 25px 50px -12px #00ffc3, 0 0 0 1.5px #00ffc3 inset, 0 0 60px rgba(0, 255, 200, 0.45); }
+        .card:nth-child(2):hover, .card:nth-child(6):hover { border-color: #b300ff; box-shadow: 0 25px 50px -12px #b300ff, 0 0 0 1.5px #b300ff inset, 0 0 60px rgba(180, 0, 255, 0.5); }
+        .card:nth-child(3):hover, .card:nth-child(7):hover { border-color: #ff3b6f; box-shadow: 0 25px 50px -12px #ff3b6f, 0 0 0 1.5px #ff3b6f inset, 0 0 60px rgba(255, 59, 111, 0.5); }
+        .card:nth-child(5):hover, .card:nth-child(8):hover { border-color: #4d6aff; box-shadow: 0 25px 50px -12px #4d6aff, 0 0 0 1.5px #4d6aff inset, 0 0 60px rgba(77, 106, 255, 0.5); }
+        
+        .card:hover .card-icon { animation: iconPulse 1.2s ease-in-out infinite; }
+        @keyframes iconPulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(0, 255, 200, 0.9)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 24px rgba(0, 255, 200, 1)); } }
+        .card::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.15), transparent); transition: left 0.6s ease; pointer-events: none; }
+        .card:hover::after { left: 100%; }
+        .card-icon { font-size: 3.2rem; line-height: 1; margin-bottom: 1rem; filter: drop-shadow(0 0 12px rgba(0, 255, 200, 0.7)); transition: transform 0.3s ease, filter 0.3s ease; }
+        
+        .card h2 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.01em; background: linear-gradient(135deg, #ffffff, #b0e0ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 0.65rem; }
+        body.light-theme .card h2 { background: linear-gradient(135deg, #1a202c, #2d3748); -webkit-background-clip: text; background-clip: text; }
+        .card p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; font-weight: 400; opacity: 0.9; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 5, 15, 0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: rgba(15, 22, 38, 0.92); backdrop-filter: blur(20px); border: 1.5px solid rgba(0, 255, 200, 0.4); border-radius: 2.5rem; max-width: 900px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 2.5rem 2rem; box-shadow: 0 0 80px rgba(0, 255, 200, 0.3), 0 0 30px rgba(180, 0, 255, 0.3); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); position: relative; scrollbar-width: thin; scrollbar-color: #00ffc3 #1a2235; color: var(--text-main); }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        body.light-theme .modal-content { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 180, 140, 0.4); }
+        
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: #1a2235; border-radius: 20px; }
+        .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #00ffc3, #b300ff); border-radius: 20px; }
+        
+        .modal-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; font-size: 2.2rem; line-height: 1; color: var(--text-muted); cursor: pointer; transition: color 0.2s, transform 0.2s; z-index: 10; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px); }
+        .modal-close:hover { color: #00ffc3; transform: rotate(90deg); border-color: #00ffc3; }
+        
+        .modal-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 1.5rem; background: linear-gradient(135deg, #00ffc3, #b300ff); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 2rem; }
+        body.light-theme .modal-title { background: linear-gradient(135deg, #00b38a, #7c00b3); -webkit-background-clip: text; background-clip: text; }
+        
+        .prompt-block { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 255, 200, 0.15); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; position: relative; }
+        body.light-theme .prompt-block { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
+        .prompt-block h3 { font-size: 1.2rem; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        body.light-theme .prompt-block h3 { color: #1a202c; }
+        
+        .best-tool-link { display: inline-block; font-size: 0.9rem; color: #4d9eff; text-decoration: none; margin-bottom: 1rem; font-weight: 600; padding: 0.2rem 0.8rem; border: 1px solid rgba(77, 158, 255, 0.3); border-radius: 20px; background: rgba(77, 158, 255, 0.05); transition: all 0.2s; }
+        .best-tool-link:hover { background: rgba(77, 158, 255, 0.2); border-color: #4d9eff; box-shadow: 0 0 10px rgba(77, 158, 255, 0.3); }
+        
+        .prompt-text { background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 10px; border-left: 3px solid #00ffc3; font-family: monospace; font-size: 0.95rem; color: #eaeef2; line-height: 1.5; white-space: pre-wrap; margin-bottom: 1rem; transition: all 0.3s ease; }
+        body.light-theme .prompt-text { background: rgba(255, 255, 255, 0.9); color: #1a202c; border-left-color: #00b38a; }
+        
+        .copy-btn { background: rgba(0, 255, 200, 0.1); border: 1px solid #00ffc3; color: #00ffc3; padding: 0.5rem 1rem; border-radius: 30px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .copy-btn:hover { background: #00ffc3; color: #0b0e1a; box-shadow: 0 0 15px rgba(0, 255, 200, 0.4); }
+        .copy-btn.copied { background: #00ffc3; color: #0b0e1a; }
+        
+        @keyframes cardAppear { 0% { opacity: 0; transform: translateY(30px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeSlide { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .glow-line { height: 2px; width: 100%; background: linear-gradient(90deg, transparent, #00ffc3, #b300ff, #ff3b6f, transparent); margin-top: 2rem; opacity: 0.3; border-radius: 10px; }
+        
+        /* Кнопки управления в шапке */
+        .top-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            text-decoration: none;
+            color: var(--text-main);
+        }
+        .nav-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 200, 0.3);
+        }
+        body.light-theme .nav-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .nav-btn:hover {
+            border-color: #00b38a;
+            box-shadow: 0 0 15px rgba(0, 179, 138, 0.3);
+        }
+        
+        @media (max-width: 700px) {
+            body { padding: 1.5rem 1rem; }
+            .catalog-grid { gap: 1.5rem; }
+            .card { padding: 1.6rem 1.3rem; border-radius: 1.8rem; }
+            .card h2 { font-size: 1.6rem; }
+            .modal-content { padding: 2rem 1.3rem; border-radius: 2rem; }
+            .modal-title { font-size: 1.8rem; margin-bottom: 1.5rem; }
+            .top-controls { top: 0.5rem; right: 0.5rem; }
+        }
+        @media (max-width: 450px) {
+            .card { padding: 1.4rem 1.2rem; }
+            .card-icon { font-size: 2.6rem; }
+            .tagline { font-size: 1rem; }
+            .modal-close { top: 0.8rem; right: 1rem; font-size: 1.8rem; width: 38px; height: 38px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="top-controls">
+            <a href="start.html" class="nav-btn" title="На главную">🏠</a>
+            <button id="themeToggle" class="nav-btn" title="Переключить тему">🌙</button>
+        </div>
+        
+        <header>
+            <h1>NEON PROMPTS</h1>
+            <div class="tagline">Готовые промпты для ИИ</div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Каталог</a>
+                <a href="tutorials.html" class="nav-link">Туториалы</a>
+                <a href="prompts.html" class="nav-link active">Промпты</a>
+            </nav>
+        </header>
+
+        <main>
+            <div id="catalogGrid" class="catalog-grid"></div>
+            <div class="glow-line"></div>
+        </main>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content" id="modalContent">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ЛОГИКА ТЕМЫ
+        const themeToggle = document.getElementById('themeToggle');
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+            if (themeToggle) themeToggle.textContent = '☀️';
+        }
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                if (document.body.classList.contains('light-theme')) {
+                    themeToggle.textContent = '☀️';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    themeToggle.textContent = '🌙';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        }
+
+        // ДАННЫЕ ПРОМПТОВ
+        const promptsData = [            { icon: '🎨', title: 'Генерация картинок', description: 'Промпты для Leonardo, Midjourney, Ideogram и других.', prompts: [
+                { title: '📸 Фотореалистичный портрет', bestTool: 'Midjourney', bestToolUrl: 'https://www.midjourney.com', text: 'Close-up portrait of a [возраст] [пол] with [цвет] hair, wearing [одежда], [эмоция] expression. Cinematic lighting, soft shadows, 85mm lens, f/1.8, ultra-realistic, 8k, highly detailed skin texture, photorealistic, masterpiece.', uaText: 'Портрет крупним планом [вік] [стать] з [колір] волоссям, в [одяг], вираз [емоція]. Кінематографічне освітлення, м\'які тіні, об\'єктив 85mm, f/1.8, ультрареалістичність, 8k, високодеталізована текстура шкіри, фотореалізм, шедевр.' },
+                { title: '✨ Логотип с текстом', bestTool: 'Ideogram', bestToolUrl: 'https://ideogram.ai', text: 'A minimalist vector logo for a [сфера бизнеса] company named "[Название]". The design features [элемент, например: a stylized cup] and the text "[Название]" in a bold, modern sans-serif font. White background, flat design, clean lines, high contrast, professional branding.', uaText: 'Мінімалістичний векторний логотип для компанії у сфері [сфера бізнесу] під назвою "[Назва]". Дизайн містить [елемент, наприклад: стилізовану чашку] та текст "[Назва]" жирним, сучасним шрифтом без зарубок. Білий фон, плоский дизайн, чисті лінії, високий контраст, професійний брендинг.' },
+                { title: '🎨 3D-персонаж в стиле Pixar', bestTool: 'Leonardo AI', bestToolUrl: 'https://leonardo.ai', text: 'A cute 3D character of a [кто это, например: маленький дракон], Pixar animation style, big expressive eyes, soft lighting, highly detailed, vibrant colors, standing in a magical forest, 8k resolution, octane render, trending on ArtStation.', uaText: 'Милий 3D-персонаж [хто це, наприклад: маленький дракон], стиль анімації Pixar, великі виразні очі, м\'яке освітлення, висока деталізація, яскраві кольори, стоїть у чарівному лісі, роздільна здатність 8k, рендер octane, популярне на ArtStation.' },
+                { title: '🖼️ Интерьер в скандинавском стиле', bestTool: 'Krea AI', bestToolUrl: 'https://krea.ai', text: 'Interior design of a modern living room, scandinavian style, large windows with natural light, wooden floor, minimalist furniture, cozy atmosphere, indoor plants, highly detailed, photorealistic, architectural photography, 4k.', uaText: 'Дизайн інтер\'єру сучасної вітальні, скандинавський стиль, великі вікна з природним світлом, дерев\'яна підлога, мінімалістичні меблі, затишна атмосфера, кімнатні рослини, висока деталізація, фотореалізм, архітектурна фотографія, 4k.' }
+            ]},
+            { icon: '⚡', title: 'Вайбкодинг', description: 'Создание сайтов, приложений и анализ файлов.', prompts: [
+                { title: '💻 Создание сайта с нуля (HTML/CSS/JS)', bestTool: 'Cursor', bestToolUrl: 'https://cursor.com', text: 'Ты — senior frontend-разработчик. Напиши чистый, семантический и адаптивный код для одностраничного сайта. Тема сайта: [опиши тему, например: портфолио фотографа]. Стиль: [например: минимализм, тёмная тема, неоновые акценты]. Обязательно используй Flexbox или CSS Grid. Добавь плавные анимации при наведении. Весь CSS и JS напиши внутри одного файла HTML.', uaText: 'Ти — senior frontend-розробник. Напиши чистий, семантичний та адаптивний код для односторінкового сайту. Тема сайту: [опиши тему, наприклад: портфоліо фотографа]. Стиль: [наприклад: мінімалізм, темна тема, неонові акценти]. Обов\'язково використовуй Flexbox або CSS Grid. Додай плавні анімації при наведенні. Весь CSS та JS напиши всередині одного файлу HTML.' },
+                { title: '🎨 Дизайн сайта по описанию', bestTool: 'v0.dev', bestToolUrl: 'https://v0.dev', text: 'Создай современный и стильный дизайн для [тип сайта, например: лендинг для кофейни]. Целевая аудитория: [опиши аудиторию]. Основные цвета: [цвета]. Сайт должен содержать следующие секции: шапка с меню, главный экран с кнопкой (Hero section), блок с преимуществами, галерея и футер. Используй Tailwind CSS для стилизации.', uaText: 'Створи сучасний та стильний дизайн для [тип сайту, наприклад: лендінг для кав\'ярні]. Цільова аудиторія: [опиши аудиторію]. Основні кольори: [кольори]. Сайт повинен містити наступні секції: шапка з меню, головний екран з кнопкою (Hero section), блок з перевагами, галерея та футер. Використовуй Tailwind CSS для стилізації.' },
+                { title: '🚀 Сайт с адресом https (Деплой)', bestTool: 'Replit', bestToolUrl: 'https://replit.com', text: 'У меня есть готовый код сайта (HTML/CSS/JS). Пожалуйста, объясни пошагово, как мне развернуть его в Replit так, чтобы получить рабочую ссылку (URL) с защищенным протоколом HTTPS, которой я смогу поделиться с друзьями. Какие настройки нужно включить, чтобы сайт не «засыпал»?', uaText: 'У мене є готовий код сайту (HTML/CSS/JS). Будь ласка, поясни покроково, як мені розгорнути його в Replit так, щоб отримати робоче посилання (URL) із захищеним протоколом HTTPS, яким я зможу поділитися з друзями. Які налаштування потрібно включити, щоб сайт не «засинав»?' },
+                { title: '📱 Простое приложение в браузере', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Напиши код для простого веб-приложения прямо в браузере. Приложение: [например, калькулятор чаевых или список задач To-Do]. Оно должно работать без сервера, используя только HTML, CSS и JavaScript (Vanilla JS). Сделай красивый интерфейс с использованием CSS-фреймворка [например, Bootstrap].', uaText: 'Напиши код для простого веб-додатку прямо в браузері. Додаток: [наприклад, калькулятор чайових або список завдань To-Do]. Він повинен працювати без сервера, використовуючи лише HTML, CSS та JavaScript (Vanilla JS). Зроби гарний інтерфейс з використанням CSS-фреймворку [наприклад, Bootstrap].' },
+                { title: '🤖 Написание кода для Telegram-бота', bestTool: 'Cursor', bestToolUrl: 'https://cursor.com', text: 'Ты — эксперт по Python и библиотеке aiogram. Напиши код для Telegram-бота, который делает следующее: [опиши функционал, например: принимает ссылку и выдает количество символов на странице]. Бот должен иметь кнопки меню (ReplyKeyboardMarkup). Добавь комментарии к коду на русском языке, чтобы я понял, как он работает.', uaText: 'Ти — експерт з Python та бібліотеки aiogram. Напиши код для Telegram-бота, який робить наступне: [опиши функціонал, наприклад: приймає посилання і видає кількість символів на сторінці]. Бот повинен мати кнопки меню (ReplyKeyboardMarkup). Додай коментарі до коду російською мовою, щоб я зрозумів, як він працює.' },
+                { title: '📊 Анализ большого файла (PDF/Excel)', bestTool: 'Gemini', bestToolUrl: 'https://gemini.google.com', text: 'Я прикрепил большой файл [укажи формат: PDF или Excel]. Выступи в роли аналитика. 1) Составь краткое резюме этого документа (до 500 слов). 2) Найди все упоминания [ключевое слово] и выпиши контекст. 3) Если это таблица с данными, найди 3 главные закономерности и предложи, как их можно использовать.', uaText: 'Я прикріпив великий файл [вкажи формат: PDF або Excel]. Виступи в ролі аналітика. 1) Склади короткий резюме цього документа (до 500 слів). 2) Знайди всі згадки [ключове слово] і випиши контекст. 3) Якщо це таблиця з даними, знайди 3 головні закономірності та запропонуй, як їх можна використовувати.' },
+                { title: '🖥️ Создание программы для компьютера', bestTool: 'Cursor', bestToolUrl: 'https://cursor.com', text: 'Напиши код для простой программы на Python, которая запускается на компьютере. Функционал программы: [например: переименовывает все файлы в папке по шаблону или создает резервную копию папки]. Напиши пошаговую инструкцию, как мне установить Python (если его нет), как сохранить код в файл .py и как запустить его.', uaText: 'Напиши код для простої програми на Python, яка запускається на комп\'ютері. Функціонал програми: [наприклад: перейменовує всі файли в папці за шаблоном або створює резервну копію папки]. Напиши покрокову інструкцію, як мені встановити Python (якщо його немає), як зберегти код у файл .py і як запустити його.' },
+                { title: '📱 Создание мобильного приложения (No-code)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Я хочу создать простое мобильное приложение без знания кода. Идея приложения: [опиши идею, например: трекер привычек]. Посоветуй 3 лучших No-code платформы для этого (например, Glide, Adalo, FlutterFlow). Напиши пошаговый план, как собрать MVP (минимально жизнеспособный продукт) на одной из них.', uaText: 'Я хочу створити простий мобільний додаток без знання коду. Ідея додатку: [опиши ідею, наприклад: трекер звичок]. Порадь 3 найкращі No-code платформи для цього (наприклад, Glide, Adalo, FlutterFlow). Напиши покроковий план, як зібрати MVP (мінімально життєздатний продукт) на одній з них.' }
+            ]},
+            { icon: '📝', title: 'Копирайтинг', description: 'Тексты, посты, описания товаров и редактура.', prompts: [
+                { title: '🛍️ Продающее описание товара (AIDA)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Ты — профессиональный копирайтер с 10-летним опытом. Напиши продающее описание для товара: [название товара]. Характеристики: [перечисли 3-5 главных свойств]. Целевая аудитория: [опиши, кто покупает, например: мамы в декрете, геймеры]. Используй технику AIDA (Внимание, Интерес, Желание, Действие). Тон: [дружелюбный/экспертный/дерзкий]. Обязательно используй эмодзи для структуры.', uaText: 'Ти — професійний копірайтер з 10-річним досвідом. Напиши продаючий опис для товару: [назва товару]. Характеристики: [перелічи 3-5 головних властивостей]. Цільова аудиторія: [опиши, хто купує, наприклад: мами в декреті, геймери]. Використовуй техніку AIDA (Увага, Інтерес, Бажання, Дія). Тон: [дружній/експертний/зухвалий]. Обов\'язково використовуй емодзі для структури.' },
+                { title: '📱 Единичный пост для соцсетей', bestTool: 'Claude', bestToolUrl: 'https://claude.ai', text: 'Напиши один вовлекающий пост для [Instagram/Telegram] на тему: [тема поста]. Пост должен начинаться с сильного "хука" (первого предложения, которое заставит остановиться). В основной части раскрой тему с помощью истории или полезного совета. В конце сделай призыв к действию (задать вопрос или перейти по ссылке). Добавь 5-7 релевантных хештегов.', uaText: 'Напиши один залучаючий пост для [Instagram/Telegram] на тему: [тема посту]. Пост повинен починатися з сильного "гачка" (першого речення, яке змусить зупинитися). В основній частині розкрий тему за допомогою історії або корисної поради. В кінці зроби заклик до дії (поставити питання або перейти за посиланням). Додай 5-7 релевантних хештегів.' },
+                { title: '🗂️ Сборник постов (3 варианта)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Напиши 3 разных варианта поста для [Instagram/Telegram] на тему: [тема]. Первый — в стиле сторителлинга (личная история или кейс), второй — полезный список (3-5 четких пунктов), третий — короткий, дерзкий и провокационный (чтобы вызвать обсуждение в комментариях). Для каждого варианта придумай свой цепляющий заголовок.', uaText: 'Напиши 3 різних варіанти посту для [Instagram/Telegram] на тему: [тема]. Перший — у стилі сторітелінгу (особиста історія або кейс), другий — корисний список (3-5 чітких пунктів), третій — короткий, зухвалий і провокаційний (щоб викликати обговорення в коментарях). Для кожного варіанту придумай свій чіпкий заголовок.' },
+                { title: '💥 Слоганы и девизы', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Ты — креативный директор рекламного агентства. Придумай 10 коротких и запоминающихся слоганов для бренда: [название бренда]. Сфера деятельности: [опиши сферу]. Главное преимущество: [в чем уникальность]. Слоганы должны быть разными: 3 дерзких, 3 вдохновляющих, 4 информативных (до 5 слов).', uaText: 'Ти — креативний директор рекламного агентства. Придумай 10 коротких і запам\'ятовуються слоганів для бренду: [назва бренду]. Сфера діяльності: [опиши сферу]. Головна перевага: [в чому унікальність]. Слогани повинні бути різними: 3 зухвалих, 3 надихаючих, 4 інформативних (до 5 слів).' },
+                { title: '📢 Маркетинговый текст (Email/Реклама)', bestTool: 'Claude', bestToolUrl: 'https://claude.ai', text: 'Напиши текст для рекламной рассылки (или поста в таргет). Продукт: [что продаем]. Цель: [например: заставить зарегистрироваться на вебинар]. Главная боль клиента: [например: нехватка времени]. Напиши 3 варианта заголовка (Subject line) для письма, чтобы его точно открыли. Сам текст сделай коротким, емким и с четким призывом к действию.', uaText: 'Напиши текст для рекламної розсилки (або посту в таргет). Продукт: [що продаємо]. Мета: [наприклад: змусити зареєструватися на вебінар]. Головний біль клієнта: [наприклад: брак часу]. Напиши 3 варіанти заголовка (Subject line) для листа, щоб його точно відкрили. Сам текст зроби коротким, ємним і з чітким закликом до дії.' },
+                { title: '✍️ Редактура и перепись «по-человечески»', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Выступи в роли строгого, но талантливого редактора. Перепиши мой текст так, чтобы он звучал более естественно, живо и «по-человечески». Убери канцелярит, воду и повторяющиеся слова. Сделай предложения короче. Сохрани при этом мой изначальный смысл. Вот текст: [вставь свой текст].', uaText: 'Виступи в ролі суворого, але талановитого редактора. Перепиши мій текст так, щоб він звучав більш природно, жваво і «по-людськи». Прибери канцелярит, воду та повторювані слова. Зроби речення коротшими. Збережи при цьому мій початковий зміст. Ось текст: [вставь свой текст].' },
+                { title: '📖 Продающий сторителлинг', bestTool: 'DeepSeek', bestToolUrl: 'https://chat.deepseek.com', text: 'Напиши историю (сторителлинг) от первого лица для блога. Тема: [например: как я запустил свой бизнес с нуля]. Главный герой: [опиши персонажа или это ты]. Проблема, с которой он столкнулся: [опиши]. Как он ее решил: [опиши]. Мораль или вывод, который должен остаться у читателя: [какой вывод]. Текст должен быть эмоциональным и удерживать внимание до конца.', uaText: 'Напиши історію (сторітелінг) від першої особи для блогу. Тема: [наприклад: як я запустив свій бізнес з нуля]. Головний герой: [опиши персонажа або це ти]. Проблема, з якою він зіткнувся: [опиши]. Як він її вирішив: [опиши]. Мораль або висновок, який повинен залишитися у читача: [який висновок]. Текст повинен бути емоційним і утримувати увагу до кінця.' }
+            ]},
+            { icon: '💼', title: 'Продажи, CRM', description: 'Общение с клиентами и автоматизация.', prompts: [
+                { title: '💬 Ответ на возражение (Дорого)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Ты — опытный менеджер по продажам. Клиент говорит: "Это слишком дорого". Напиши 3 варианта ответа, которые не обесценивают продукт, а показывают его ценность. Используй техники: дробление цены (цена за день использования), сравнение с альтернативами (сколько стоит бездействие), акцент на выгоде. Сделай ответы вежливыми, но уверенными.', uaText: 'Ти — досвідчений менеджер з продажу. Клієнт каже: "Це занадто дорого". Напиши 3 варіанти відповіді, які не знецінюють продукт, а показують його цінність. Використовуй техніки: дроблення ціни (ціна за день використання), порівняння з альтернативами (скільки коштує бездіяльність), акцент на вигоді. Зроби відповіді ввічливими, але впевненими.' },
+                { title: '📞 Скрипт холодного звонка', bestTool: 'Claude', bestToolUrl: 'https://claude.ai', text: 'Составь скрипт для холодного звонка. Я продаю [продукт/услугу]. Цель звонка — назначить встречу или продать сразу. Скрипт должен включать: 1) Приветствие (пробить барьер за 10 секунд). 2) Крюк внимания (вопрос по теме, чтобы клиент не бросил трубку). 3) Презентацию оффера (коротко, только выгоды). 4) Работу с типичными возражениями ("Мне не интересно", "Нет времени"). 5) Закрытие на следующий шаг.', uaText: 'Склади скрипт для холодного дзвінка. Я продаю [продукт/послугу]. Мета дзвінка — призначити зустріч або продати відразу. Скрипт повинен включати: 1) Привітання (пробити бар\'єр за 10 секунд). 2) Гачок уваги (питання по темі, щоб клієнт не кинув слухавку). 3) Презентацію оферу (коротко, тільки вигоди). 4) Роботу з типовими запереченнями ("Мені не цікаво", "Немає часу"). 5) Закриття на наступний крок.' },
+                { title: '💸 Генерация скриптов продаж (A/B тесты)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Выступи в роли руководителя отдела продаж. Напиши 2 разных варианта скрипта для продажи [товар/услуга] в переписке. Вариант А: строго официальный, деловой. Вариант Б: дружелюбный, с использованием эмодзи и сленга. В каждом варианте должен быть крюк, презентация и закрытие на оплату.', uaText: 'Виступи в ролі керівника відділу продажів. Напиши 2 різних варіанти скрипта для продажу [товар/послуга] в переписці. Варіант А: строго офіційний, діловий. Варіант Б: дружній, з використанням емодзі та сленгу. У кожному варіанті повинен бути гачок, презентація і закриття на оплату.' },
+                { title: '🎯 Чат-бот для сайта (сценарий)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Напиши сценарий (диалоговое дерево) для чат-бота на сайте. Сфера бизнеса: [например: доставка суши]. Бот должен приветствовать клиента, ответить на 3 частых вопроса (например: "Сколько стоит доставка?", "Как оплатить?", "Есть ли скидки?"), собрать контакт (телефон) и передать менеджеру. Опиши кнопки, которые будут видеть пользователи.', uaText: 'Напиши сценарій (діалогове дерево) для чат-бота на сайті. Сфера бізнесу: [наприклад: доставка суші]. Бот повинен вітати клієнта, відповісти на 3 частих питання (наприклад: "Скільки коштує доставка?", "Як оплатити?", "Чи є знижки?"), зібрати контакт (телефон) і передати менеджеру. Опиши кнопки, які будуть бачити користувачі.' },
+                { title: '📱 Автоматизация переписок в Instagram', bestTool: 'ManyChat', bestToolUrl: 'https://manychat.com', text: 'Напиши сценарий для автоматизации в Instagram (ManyChat). Клиент пишет слово "[ключевое слово, например: ЦЕНА]" в комментариях или в Direct. Напиши текст первого автоответа (чтобы зацепить), а затем сценарий из 3 шагов: 1) Выдача прайса. 2) Ответ на вопрос "А есть в наличии?". 3) Предложение оформить заказ по специальной ссылке.', uaText: 'Напиши сценарій для автоматизації в Instagram (ManyChat). Клієнт пише слово "[ключове слово, наприклад: ЦІНА]" в коментарях або в Direct. Напиши текст першої автовідповіді (щоб зачепити), а потім сценарій з 3 кроків: 1) Видача прайсу. 2) Відповідь на питання "А є в наявності?". 3) Пропозиція оформити замовлення за спеціальним посиланням.' },
+                { title: '✉️ Автоматизация рассылок в Telegram', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Составь цепочку из 3 сообщений для приветственной рассылки в Telegram-боте. Цель: прогреть подписчика и продать [продукт/услугу]. Сообщение 1 (сразу после подписки): знакомство и обещание пользы. Сообщение 2 (через день): кейс или отзыв клиента. Сообщение 3 (через 2 дня): оффер с ограничением по времени.', uaText: 'Склади ланцюжок з 3 повідомлень для вітальної розсилки в Telegram-боті. Мета: прогріти підписника і продати [продукт/послугу]. Повідомлення 1 (відразу після підписки): знайомство і обіцянка користі. Повідомлення 2 (через день): кейс або відгук клієнта. Повідомлення 3 (через 2 дні): офер з обмеженням за часом.' },
+                { title: '🤝 Скрипт для WhatsApp (воронка)', bestTool: 'Claude', bestToolUrl: 'https://claude.ai', text: 'Напиши воронку продаж в WhatsApp для сферы услуг (например, салон красоты или репетитор). Начало: клиент оставил заявку. Напиши 5 коротких сообщений: 1) Приветствие и уточнение задачи. 2) Квалификация (вопросы, чтобы понять, подходит ли услуга). 3) Презентация решения. 4) Снятие сомнений. 5) Закрытие на запись и предоплату.', uaText: 'Напиши воронку продажів в WhatsApp для сфери послуг (наприклад, салон краси або репетитор). Початок: клієнт залишив заявку. Напиши 5 коротких повідомлень: 1) Привітання та уточнення завдання. 2) Кваліфікація (питання, щоб зрозуміти, чи підходить послуга). 3) Презентація рішення. 4) Зняття сумнівів. 5) Закриття на запис і передоплату.' },
+                { title: '🔄 Связка CRM и мессенджера (идея)', bestTool: 'Make', bestToolUrl: 'https://www.make.com', text: 'Я хочу настроить связку: клиент заполняет форму на сайте -> его данные падают в мою CRM (например, Google Sheets или Битрикс24) -> ему автоматически приходит сообщение в Telegram/WhatsApp с приветствием. Напиши пошаговый план, какие сервисы использовать и как настроить эту автоматизацию без кода (через Make или Zapier).', uaText: 'Я хочу налаштувати зв\'язку: клієнт заповнює форму на сайті -> його дані падають в мою CRM (наприклад, Google Sheets або Бітрікс24) -> йому автоматично приходить повідомлення в Telegram/WhatsApp з привітанням. Напиши покроковий план, які сервіси використовувати і як налаштувати цю автоматизацію без коду (через Make або Zapier).' }
+            ]},
+            { icon: '📊', title: 'Анализ данных', description: 'Работа с таблицами и отчетами.', prompts: [
+                { title: '📈 Анализ таблицы продаж', bestTool: 'ChatGPT (Data Analysis)', bestToolUrl: 'https://chat.openai.com', text: 'Выступай в роли data-аналитика. Я прикрепил файл с данными о продажах. Проанализируй его: 1) Найди топ-3 самых прибыльных товара. 2) Выяви месяц с самым большим спадом продаж. 3) Сделай вывод: какие 3 действия нужно предпринять, чтобы увеличить выручку в следующем месяце.', uaText: 'Виступай в ролі data-аналітика. Я прикріпив файл з даними про продажі. Проаналізуй його: 1) Знайди топ-3 найприбутковіших товари. 2) Вияви місяць з найбільшим спадом продажів. 3) Зроби висновок: які 3 дії потрібно зробити, щоб збільшити виручку наступного місяця.' },
+                { title: '📊 Графики и поиск закономерностей', bestTool: 'Gemini', bestToolUrl: 'https://gemini.google.com', text: 'Я прикрепил большой файл с данными (Excel/CSV). Пожалуйста, проанализируй его и построй 3 графика: 1) Динамику продаж по месяцам (линейный график). 2) Распределение клиентов по регионам (круговая диаграмма). 3) Зависимость суммы чека от возраста покупателя (точечный график). Напиши краткие выводы по каждому графику.', uaText: 'Я прикріпив великий файл з даними (Excel/CSV). Будь ласка, проаналізуй його та побудуй 3 графіки: 1) Динаміку продажів за місяцями (лінійний графік). 2) Розподіл клієнтів за регіонами (кругова діаграма). 3) Залежність суми чека від віку покупця (точковий графік). Напиши короткі висновки по кожному графіку.' },
+                { title: '🧮 Написание формулы Excel', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Мне нужна формула для Excel. Задача: [опиши, что нужно сделать, например: посчитать сумму всех заказов за январь, если в столбце А даты, а в столбце B суммы]. Напиши формулу и объясни пошагово, как она работает, чтобы я мог в будущем менять её под свои нужды.', uaText: 'Мені потрібна формула для Excel. Завдання: [опиши, що потрібно зробити, наприклад: порахувати суму всіх замовлень за січень, якщо в стовпці А дати, а в стовпці B суми]. Напиши формулу і поясни покроково, як вона працює, щоб я міг у майбутньому змінювати її під свої потреби.' },
+                { title: '🤖 Таблицы с ИИ (сводки и генерация)', bestTool: 'Rows AI', bestToolUrl: 'https://rows.com', text: 'Выступи в роли эксперта по автоматизации таблиц. У меня есть таблица в Google Sheets / Rows с колонками: [перечисли колонки, например: Имя клиента, Товар, Комментарий]. Напиши 3 идеи, как я могу использовать встроенный ИИ в таблицах, чтобы автоматически генерировать сводки, переводить текст или находить ошибки в данных.', uaText: 'Виступи в ролі експерта з автоматизації таблиць. У мене є таблиця в Google Sheets / Rows з колонками: [перелічи колонки, наприклад: Ім\'я клієнта, Товар, Коментар]. Напиши 3 ідеї, як я можу використовувати вбудований ШІ в таблицях, щоб автоматично генерувати зведення, перекладати текст або знаходити помилки в даних.' }
+            ]},
+            { icon: '🧩', title: 'No-code', description: 'Автоматизация без программирования.', prompts: [
+                { title: '⚙️ Сценарий автоматизации', bestTool: 'Make', bestToolUrl: 'https://www.make.com', text: 'Я хочу автоматизировать процесс: [опиши процесс, например: когда кто-то заполняет форму на сайте, данные падают в Google Sheets, и мне приходит уведомление в Telegram]. Предложи пошаговый план, как это сделать в Make или Zapier. Какие приложения использовать и какие триггеры/действия настроить?', uaText: 'Я хочу автоматизувати процес: [опиши процес, наприклад: коли хтось заповнює форму на сайті, дані падають в Google Sheets, і мені приходить повідомлення в Telegram]. Запропонуй покроковий план, як це зробити в Make або Zapier. Які додатки використовувати і які тригери/дії налаштувати?' },
+                { title: '💡 Идеи для автоматизации (5 штук)', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Я — владелец малого бизнеса ([сфера]). Мои ежедневные рутинные задачи: [перечисли, например: отправка чеков, напоминания клиентам]. Предложи 5 идей, как я могу автоматизировать эти задачи с помощью no-code инструментов (Zapier, Make, Albato), чтобы сэкономить минимум 1 час в день. Для каждой идеи напиши, какие сервисы связать.', uaText: 'Я — власник малого бізнесу ([сфера]). Мої щоденні рутинні завдання: [перелічи, наприклад: відправка чеків, нагадування клієнтам]. Запропонуй 5 ідей, як я можу автоматизувати ці завдання за допомогою no-code інструментів (Zapier, Make, Albato), щоб зекономити мінімум 1 годину на день. Для кожної ідеї напиши, які сервіси зв\'язати.' },
+                { title: '🔗 Связка двух сервисов (Без кода)', bestTool: 'Zapier', bestToolUrl: 'https://zapier.com', text: 'Мне нужно связать два сервиса: [Сервис А, например: Tilda] и [Сервис Б, например: Notion]. Задача: когда происходит событие [что именно, например: приходит заявка на Tilda], в Сервисе Б должна создаваться новая страница с данными клиента. Напиши точную инструкцию, какие поля нужно сопоставить и как настроить триггер в Zapier/Make.', uaText: 'Мені потрібно зв\'язати два сервіси: [Сервіс А, наприклад: Tilda] і [Сервіс Б, наприклад: Notion]. Завдання: коли відбувається подія [що саме, наприклад: приходить заявка на Tilda], в Сервісі Б повинна створюватися нова сторінка з даними клієнта. Напиши точну інструкцію, які поля потрібно зіставити і як налаштувати тригер в Zapier/Make.' },
+                { title: '⏱️ Экономия времени (Аудит процессов)', bestTool: 'DeepSeek', bestToolUrl: 'https://chat.deepseek.com', text: 'Выступи в роли бизнес-аналитика. Вот список моих ежедневных задач: [перечисли 5-7 задач, например: ответы на комментарии, проверка почты, сбор отчетов]. Проанализируй их и скажи, какие 3 из них можно автоматизировать быстрее всего (low-code/no-code), чтобы я тратил на них не 2 часа, а 10 минут.', uaText: 'Виступи в ролі бізнес-аналітика. Ось список моїх щоденних завдань: [перелічи 5-7 завдань, наприклад: відповіді на коментарі, перевірка пошти, збір звітів]. Проаналізуй їх і скажи, які 3 з них можна автоматизувати найшвидше (low-code/no-code), щоб я витрачав на них не 2 години, а 10 хвилин.' }
+            ]},
+            { icon: '🧠', title: 'Обучение', description: 'Промпты для учебы и конспектов.', prompts: [
+                { title: '🎓 Объяснение сложной темы', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Объясни мне тему "[тема]" так, как будто мне 12 лет. Используй простые слова, жизненные аналогии и примеры. Избегай сложных терминов. В конце задай мне 3 вопроса, чтобы проверить, как я понял.', uaText: 'Поясни мені тему "[тема]" так, ніби мені 12 років. Використовуй прості слова, життєві аналогії та приклади. Уникай складних термінів. В кінці постав мені 3 питання, щоб перевірити, як я зрозумів.' },
+                { title: '📝 Создание конспекта по тексту', bestTool: 'NotebookLM', bestToolUrl: 'https://notebooklm.google.com', text: 'Прочитай этот текст: [вставь текст]. Составь по нему структурированный конспект. Выдели главные мысли, выпиши ключевые даты/термины и сделай краткое резюме из 3 предложений.', uaText: 'Прочитай цей текст: [вставь текст]. Склади по ньому структурований конспект. Виділи головні думки, випиши ключові дати/терміни і зроби короткий резюме з 3 речень.' },
+                { title: '🧠 Проверка знаний (Тест)', bestTool: 'Claude', bestToolUrl: 'https://claude.ai', text: 'Выступи в роли строгого преподавателя. Я только что изучил тему "[тема]". Составь для меня тест из 5 вопросов с вариантами ответов (A, B, C, D), чтобы проверить мои знания. Не показывай правильные ответы сразу, я напишу свои варианты, а ты потом проверишь.', uaText: 'Виступи в ролі суворого викладача. Я щойно вивчив тему "[тема]". Склади для мене тест з 5 питань з варіантами відповідей (A, B, C, D), щоб перевірити мої знання. Не показуй правильні відповіді відразу, я напишу свої варіанти, а ти потім перевіриш.' },
+                { title: '🎧 Генерация подкаста из файла', bestTool: 'NotebookLM', bestToolUrl: 'https://notebooklm.google.com', text: 'Я загрузил(а) лекцию/документ. Пожалуйста, сделай из этого текста сценарий для короткого подкаста (до 5 минут). Представь, что это диалог двух ведущих, которые обсуждают главные идеи текста и объясняют их простым языком.', uaText: 'Я завантажив(ла) лекцію/документ. Будь ласка, зроби з цього тексту сценарій для короткого подкасту (до 5 хвилин). Уяви, що це діалог двох ведучих, які обговорюють головні ідеї тексту і пояснюють їх простою мовою.' }
+            ]},
+            { icon: '🖼️', title: 'Работа с фото', description: 'Апскейл, ретушь и карточки.', prompts: [
+                { title: '✨ Апскейл и улучшение фото', bestTool: 'Krea AI', bestToolUrl: 'https://krea.ai', text: 'Enhance the image, upscale to 4k resolution, fix blurriness, add sharp details to the face and clothes, improve lighting, photorealistic style, high quality.', uaText: 'Покращ зображення, збільш роздільну здатність до 4k, виправ розмитість, додай чіткі деталі обличчя та одягу, покращ освітлення, фотореалістичний стиль, висока якість.' },
+                { title: '📸 Описание фото для соцсетей', bestTool: 'ChatGPT', bestToolUrl: 'https://chat.openai.com', text: 'Посмотри на это фото [прикрепи фото] и напиши к нему 3 варианта подписи для Instagram. Первый — с юмором, второй — философский, третий — короткий и эстетичный. Добавь подходящие хештеги.', uaText: 'Подивись на це фото [прикріпи фото] і напиши до нього 3 варіанти підпису для Instagram. Перший — з гумором, другий — філософський, третій — короткий і естетичний. Додай відповідні хештеги.' },
+                { title: '🛍️ Удаление фона для карточки товара', bestTool: 'Photoroom', bestToolUrl: 'https://www.photoroom.com', text: 'Выступи в роли дизайнера карточек для маркетплейсов. У меня есть фото товара: [что за товар]. Подскажи, на каком фоне его лучше сфотографировать или сгенерировать (цвет, текстура), чтобы оно выглядело дорого и продающе. Напиши текстовое описание идеального фона для этого товара.', uaText: 'Виступи в ролі дизайнера карток для маркетплейсів. У мене є фото товару: [що за товар]. Підкажи, на якому фоні його краще сфотографувати або згенерувати (колір, текстура), щоб воно виглядало дорого і продающе. Напиши текстовий опис ідеального фону для цього товару.' },
+                { title: '🎨 Замена фона на креативный', bestTool: 'Krea AI', bestToolUrl: 'https://krea.ai', text: 'Мне нужно заменить фон на фото. Опиши детальный промпт для нейросети, чтобы сгенерировать новый фон. Тема фото: [что на фото, например: девушка в красном платье]. Какой фон подойдет: [например: ночной город с неоном или студийный минимализм].', uaText: 'Мені потрібно замінити фон на фото. Опиши детальний промпт для нейромережі, щоб згенерувати новий фон. Тема фото: [що на фото, наприклад: дівчина в червоній сукні]. Який фон підійде: [наприклад: нічне місто з неоном або студійний мінімалізм].' }
+            ]}
+        ];
+
+        const grid = document.getElementById('catalogGrid');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalBody = document.getElementById('modalBody');
+        const modalClose = document.getElementById('modalClose');
+
+        function renderPrompts() {
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            promptsData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.1}s`;
+
+                card.innerHTML = `
+                    <div class="card-icon">${item.icon}</div>
+                    <h2>${item.title}</h2>
+                    <p>${item.description}</p>
+                `;
+
+                card.addEventListener('click', () => openPromptModal(item));
+                grid.appendChild(card);
+            });
+        }
+
+        function openPromptModal(item) {
+            let contentHTML = `<div class="modal-title">${item.icon} ${item.title}</div>`;
+
+            if (!item.prompts || item.prompts.length === 0) {
+                contentHTML += `<p style="color: #b6c8e0;">Промпты для этого раздела скоро появятся!</p>`;
+            } else {
+                item.prompts.forEach((p, i) => {
+                    const uniqueId = `prompt-${item.title.replace(/\s+/g, '-')}-${i}`;
+                    const toolHTML = p.bestTool ? `<a href="${p.bestToolUrl}" target="_blank" class="best-tool-link">➔ Лучший выбор: ${p.bestTool} ↗</a>` : '';
+                    
+                    const safeOrig = p.text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    const safeUa = (p.uaText || p.text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                    contentHTML += `
+                        <div class="prompt-block">
+                            <h3>✨ ${p.title}</h3>
+                            ${toolHTML}
+                            <div class="prompt-text" id="${uniqueId}" data-orig="${safeOrig}" data-ua="${safeUa}">${p.text}</div>
+                            
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="copy-btn" onclick="copyPrompt('${uniqueId}', this)">
+                                    <span>📋 Скопировать</span>
+                                </button>
+                                ${p.uaText ? `
+                                <button class="copy-btn ua-btn" onclick="toggleTranslate('${uniqueId}', this)">
+                                    <span>🇺🇦 На украинском</span>
+                                </button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            modalBody.innerHTML = contentHTML;
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.copyPrompt = function(elementId, btn) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span>✅ Скопировано!</span>';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        };
+
+        window.toggleTranslate = function(elementId, btn) {
+            const textEl = document.getElementById(elementId);
+            const isUA = textEl.getAttribute('data-is-ua') === 'true';
+            if (isUA) {
+                textEl.innerText = textEl.getAttribute('data-orig');
+                textEl.setAttribute('data-is-ua', 'false');
+                btn.innerHTML = '<span>🇺🇦 На украинском</span>';
+                btn.style.borderColor = '#ff3b6f';
+                btn.style.color = '#ff3b6f';
+                btn.style.background = 'rgba(255, 59, 111, 0.1)';
+            } else {
+                textEl.innerText = textEl.getAttribute('data-ua');
+                textEl.setAttribute('data-is-ua', 'true');
+                btn.innerHTML = '<span>🇬🇧 На оригинале</span>';
+                btn.style.borderColor = '#00ffc3';
+                btn.style.color = '#00ffc3';
+                btn.style.background = 'rgba(0, 255, 200, 0.1)';
+            }
+        };
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (modalClose) {
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        }
+
+        renderPrompts();
+    </script>
+</body>
+</html>

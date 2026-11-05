@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON CATALOG · AI услуги</title>
+    
+    <style>
+        /* БАЗОВЫЕ СТИЛИ */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        /* ЦВЕТА ДЛЯ ТЕМНОЙ ТЕМЫ (ПО УМОЛЧАНИЮ) */
+        :root { 
+            --bg-color: #0b0e1a; 
+            --card-bg: rgba(18, 25, 40, 0.55); 
+            --text-main: #eaeef2; 
+            --text-muted: #9aa9c0; 
+            --border: rgba(0, 255, 200, 0.25); 
+            --accent: #00ffc3; 
+        }
+
+        /* ЦВЕТА ДЛЯ МЯГКОЙ СВЕТЛОЙ ТЕМЫ */
+        body.light-theme {
+            --bg-color: #e8ecef;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2d3748;
+            --text-muted: #4a5568;
+            --border: rgba(0, 180, 140, 0.3);
+        }
+
+        body { background: var(--bg-color); background-image: radial-gradient(circle at 20% 30%, rgba(0, 255, 200, 0.05) 0%, transparent 30%), radial-gradient(circle at 80% 70%, rgba(180, 0, 255, 0.05) 0%, transparent 35%); min-height: 100vh; display: flex; flex-direction: column; color: var(--text-main); padding: 2rem 1.5rem; position: relative; transition: background 0.3s ease, color 0.3s ease; }
+        body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(0, 255, 200, 0.1), transparent 40%), radial-gradient(circle at 70% 80%, rgba(255, 0, 200, 0.1), transparent 40%); pointer-events: none; z-index: 0; }
+        .wrapper { max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+        
+        /* ШАПКА */
+        header { text-align: center; margin-bottom: 3rem; animation: fadeSlide 0.8s ease-out; }
+        h1 { font-size: clamp(2.4rem, 8vw, 4rem); font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, #00ffc3, #4d6aff, #b300ff, #ff3b6f); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 30px rgba(0, 255, 200, 0.3); margin-bottom: 0.75rem; line-height: 1.2; }
+        
+        .tagline { font-size: 1.2rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; backdrop-filter: blur(2px); display: inline-block; padding: 0.3rem 1.5rem; border-radius: 60px; border: 1px solid rgba(0, 255, 200, 0.2); background: rgba(10, 20, 30, 0.4); box-shadow: 0 0 15px rgba(0, 255, 200, 0.1); margin-bottom: 2rem; transition: all 0.3s ease; }
+        body.light-theme .tagline { background: rgba(255, 255, 255, 0.6); border-color: rgba(0, 180, 140, 0.3); }
+        
+        /* МЕНЮ */
+        .nav-menu { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .nav-link { color: var(--text-main); text-decoration: none; font-size: 1.1rem; font-weight: 600; padding: 0.6rem 1.5rem; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); transition: all 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #0b0e1a; background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 200, 0.4); }
+        body.light-theme .nav-link { border-color: rgba(0, 0, 0, 0.1); background: rgba(0, 0, 0, 0.05); }
+        body.light-theme .nav-link.active { color: #ffffff; background: #00b38a; border-color: #00b38a; }
+
+        /* СЕТКА */
+        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .card { background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 2rem; padding: 2rem 1.5rem; border: 1.5px solid var(--border); box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 255, 200, 0.1) inset, 0 0 30px rgba(0, 200, 255, 0.1); transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.25s ease, box-shadow 0.3s ease, background 0.3s ease; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; position: relative; overflow: hidden; opacity: 0; animation: cardAppear 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; will-change: transform; }
+        
+        body.light-theme .card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 180, 140, 0.15) inset;
+            border: 1.5px solid rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .card:hover {
+            background: #ffffff;
+            border-color: #00b38a;
+            box-shadow: 0 20px 40px -10px rgba(0, 180, 140, 0.3), 0 0 0 1.5px #00b38a inset;
+        }
+
+        .card:nth-child(1) { border-image: linear-gradient(145deg, #00ffc3, #4d6aff) 1; border-image-slice: 1; }
+        .card:nth-child(2) { border-image: linear-gradient(145deg, #b300ff, #ff3b6f) 1; border-image-slice: 1; }
+        .card:nth-child(3) { border-image: linear-gradient(145deg, #ff3b6f, #4d6aff) 1; border-image-slice: 1; }
+        .card:nth-child(4) { border-image: linear-gradient(145deg, #00ffc3, #b300ff) 1; border-image-slice: 1; }
+        .card:nth-child(5) { border-image: linear-gradient(145deg, #4d6aff, #ff3b6f) 1; border-image-slice: 1; }
+        .card:nth-child(6) { border-image: linear-gradient(145deg, #b300ff, #00ffc3) 1; border-image-slice: 1; }
+        .card:nth-child(7) { border-image: linear-gradient(145deg, #ff3b6f, #00ffc3) 1; border-image-slice: 1; }
+        .card:nth-child(8) { border-image: linear-gradient(145deg, #4d6aff, #b300ff) 1; border-image-slice: 1; }
+        .card:nth-child(9) { border-image: linear-gradient(145deg, #3a4b6e, #2a354a) 1; border-image-slice: 1; opacity: 0.6; filter: grayscale(0.5); pointer-events: none; cursor: default; }
+        
+        .card:not(:nth-child(9)):hover { transform: translateY(-10px) scale(1.02); background: rgba(20, 30, 50, 0.75); }
+        body.light-theme .card:not(:nth-child(9)):hover { background: #ffffff; }
+        
+        .card:nth-child(1):hover, .card:nth-child(4):hover { border-color: #00ffc3; box-shadow: 0 25px 50px -12px #00ffc3, 0 0 0 1.5px #00ffc3 inset, 0 0 60px rgba(0, 255, 200, 0.45); }
+        .card:nth-child(2):hover, .card:nth-child(6):hover { border-color: #b300ff; box-shadow: 0 25px 50px -12px #b300ff, 0 0 0 1.5px #b300ff inset, 0 0 60px rgba(180, 0, 255, 0.5); }
+        .card:nth-child(3):hover, .card:nth-child(7):hover { border-color: #ff3b6f; box-shadow: 0 25px 50px -12px #ff3b6f, 0 0 0 1.5px #ff3b6f inset, 0 0 60px rgba(255, 59, 111, 0.5); }
+        .card:nth-child(5):hover, .card:nth-child(8):hover { border-color: #4d6aff; box-shadow: 0 25px 50px -12px #4d6aff, 0 0 0 1.5px #4d6aff inset, 0 0 60px rgba(77, 106, 255, 0.5); }
+
+        .card:not(:nth-child(9)):hover .card-icon { animation: iconPulse 1.2s ease-in-out infinite; }
+        @keyframes iconPulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(0, 255, 200, 0.9)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 24px rgba(0, 255, 200, 1)); } }
+        
+        .card:not(:nth-child(9))::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.15), transparent); transition: left 0.6s ease; pointer-events: none; }
+        .card:not(:nth-child(9)):hover::after { left: 100%; }
+
+        .card-icon { font-size: 3.2rem; line-height: 1; margin-bottom: 1rem; filter: drop-shadow(0 0 12px rgba(0, 255, 200, 0.7)); transition: transform 0.3s ease, filter 0.3s ease; }
+        
+        .card h2 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.01em; background: linear-gradient(135deg, #ffffff, #b0e0ff); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 0.65rem; }
+        body.light-theme .card h2 { background: linear-gradient(135deg, #1a202c, #2d3748); -webkit-background-clip: text; background-clip: text; }
+        
+        .card p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; font-weight: 400; opacity: 0.9; }
+
+        .card.coming-soon { justify-content: center; align-items: center; text-align: center; min-height: 240px; }
+        .card.coming-soon .card-icon { font-size: 2.8rem; filter: grayscale(1) drop-shadow(0 0 10px #3f5b8c); margin-bottom: 1.2rem; }
+        .card.coming-soon h2 { background: linear-gradient(135deg, #6c7c9c, #3e4b66); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.7rem; }
+        .card.coming-soon p { color: #5c6f8c; font-size: 0.95rem; }
+        
+        /* МОДАЛЬНОЕ ОКНО */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 5, 15, 0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: rgba(15, 22, 38, 0.92); backdrop-filter: blur(20px); border: 1.5px solid rgba(0, 255, 200, 0.4); border-radius: 2.5rem; max-width: 900px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 2.5rem 2rem; box-shadow: 0 0 80px rgba(0, 255, 200, 0.3), 0 0 30px rgba(180, 0, 255, 0.3); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); position: relative; scrollbar-width: thin; scrollbar-color: #00ffc3 #1a2235; color: var(--text-main); }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        body.light-theme .modal-content { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 180, 140, 0.4); }
+        
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: #1a2235; border-radius: 20px; }
+        .modal-content::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #00ffc3, #b300ff); border-radius: 20px; }
+        
+        .modal-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; font-size: 2.2rem; line-height: 1; color: var(--text-muted); cursor: pointer; transition: color 0.2s, transform 0.2s; z-index: 10; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px); }
+        .modal-close:hover { color: #00ffc3; transform: rotate(90deg); border-color: #00ffc3; }
+        
+        .modal-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 2rem; background: linear-gradient(135deg, #00ffc3, #b300ff); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: 2rem; }
+        body.light-theme .modal-title { background: linear-gradient(135deg, #00b38a, #7c00b3); -webkit-background-clip: text; background-clip: text; }
+        
+        .service-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 255, 200, 0.15); border-radius: 1.5rem; padding: 1.4rem 1.6rem; margin-bottom: 1.2rem; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
+        .service-item:hover { border-color: #00ffc3; box-shadow: 0 0 25px rgba(0, 255, 200, 0.2); transform: translateY(-3px); }
+        body.light-theme .service-item { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.06); }
+        
+        .service-item h3 { font-size: 1.4rem; font-weight: 700; color: #ffffff; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+        body.light-theme .service-item h3 { color: #1a202c; }
+        
+        .service-item h3 a { color: #4d9eff; text-decoration: none; font-weight: 500; font-size: 0.85rem; padding: 0.25rem 0.9rem; border-radius: 40px; border: 1px solid rgba(77, 158, 255, 0.4); background: rgba(77, 158, 255, 0.1); transition: all 0.2s; letter-spacing: 0.3px; }
+        .service-item h3 a:hover { background: rgba(77, 158, 255, 0.25); border-color: #4d9eff; color: #aad0ff; }
+        
+        .service-item p { color: #b6c8e0; font-size: 0.95rem; line-height: 1.55; margin: 0.5rem 0; }
+        body.light-theme .service-item p { color: #4a5568; }
+        
+        .service-item strong { color: #ffffff; font-weight: 600; }
+        body.light-theme .service-item strong { color: #1a202c; }
+        
+        .service-item .limit-badge { display: inline-block; margin-top: 0.5rem; padding: 0.25rem 0.9rem; background: rgba(255, 60, 100, 0.1); border: 1px solid rgba(255, 60, 100, 0.3); border-radius: 40px; font-size: 0.8rem; color: #ff8aa8; letter-spacing: 0.2px; }
+
+        @keyframes cardAppear { 0% { opacity: 0; transform: translateY(30px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fadeSlide { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        
+        .glow-line { height: 2px; width: 100%; background: linear-gradient(90deg, transparent, #00ffc3, #b300ff, #ff3b6f, transparent); margin-top: 2rem; opacity: 0.3; border-radius: 10px; }
+
+        /* Кнопки управления в шапке */
+        .top-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            text-decoration: none;
+            color: var(--text-main);
+        }
+        .nav-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 200, 0.3);
+        }
+        body.light-theme .nav-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .nav-btn:hover {
+            border-color: #00b38a;
+            box-shadow: 0 0 15px rgba(0, 179, 138, 0.3);
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1.5rem 1rem; }
+            .catalog-grid { gap: 1.5rem; }
+            .card { padding: 1.6rem 1.3rem; border-radius: 1.8rem; }
+            .card h2 { font-size: 1.6rem; }
+            .modal-content { padding: 2rem 1.3rem; border-radius: 2rem; }
+            .modal-title { font-size: 1.8rem; margin-bottom: 1.5rem; }
+            .service-item { padding: 1.1rem 1.2rem; }
+            .service-item h3 { font-size: 1.25rem; }
+            .top-controls { top: 0.5rem; right: 0.5rem; }
+        }
+        @media (max-width: 450px) {
+            .card { padding: 1.4rem 1.2rem; }
+            .card-icon { font-size: 2.6rem; }
+            .tagline { font-size: 1rem; }
+            .modal-close { top: 0.8rem; right: 1rem; font-size: 1.8rem; width: 38px; height: 38px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="top-controls">
+            <a href="start.html" class="nav-btn" title="На главную">🏠</a>
+            <button id="themeToggle" class="nav-btn" title="Переключить тему">🌙</button>
+        </div>
+        
+        <header>
+            <h1>NEON CATALOG</h1>
+            <div class="tagline">AI-инструменты под рукой</div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link active">Каталог</a>
+                <a href="tutorials.html" class="nav-link">Туториалы</a>
+                <a href="prompts.html" class="nav-link">Промпты</a>
+            </nav>
+        </header>
+
+        <main>
+            <div id="catalogGrid" class="catalog-grid"></div>
+            <div class="glow-line"></div>
+        </main>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content" id="modalContent">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ЛОГИКА ТЕМЫ
+        const themeToggle = document.getElementById('themeToggle');
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+            if (themeToggle) themeToggle.textContent = '☀️';
+        }
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                if (document.body.classList.contains('light-theme')) {
+                    themeToggle.textContent = '☀️';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    themeToggle.textContent = '🌙';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        }
+
+        // ДАННЫЕ КАТАЛОГА
+        const services = [
+            { id: 'image-gen', icon: '🎨', title: 'Генерация картинок', description: 'Фотореализм, арты, векторы и текст на изображениях — лучшие нейросети для визуала.', details: [
+                { name: 'Leonardo AI', url: 'https://leonardo.ai', what: 'Фотореалистичные портреты, концепт-арты, 3D-модели, аниме.', advantage: 'Огромный выбор моделей и детальный контроль.', limits: '~150 токенов в сутки.' },
+                { name: 'Ideogram', url: 'https://ideogram.ai', what: 'Постеры, логотипы, открытки, картинки с надписями.', advantage: 'Идеальный текст и шрифты (включая кириллицу) на изображениях.', limits: 'Лимит быстрых генераций в сутки.' },
+                { name: 'Recraft', url: 'https://recraft.ai', what: 'Векторная графика (SVG), иконки, логотипы.', advantage: 'Строгий контроль цветовой палитры.', limits: 'Ежедневный запас бесплатных кредитов.' },
+                { name: 'Krea AI', url: 'https://krea.ai', what: 'Четкие арты (FLUX), рендеры по скетчам.', advantage: 'Генерация в реальном времени и мощный апскейлер.', limits: 'Бесплатные ежедневные кредиты.' }
+            ]},
+            { id: 'vibe-coding', icon: '⚡', title: 'Вайбкодинг', description: 'Пиши код словами — от идеи до готового сайта за минуты, без библиотек и боли.', details: [
+                { name: 'Cursor', url: 'https://cursor.com', what: 'Создание сайтов и программ через ИИ-чат.', advantage: 'Пишет файлы и исправляет ошибки сам.', limits: '200 «умных» запросов в месяц.' },
+                { name: 'v0.dev', url: 'https://v0.dev', what: 'Дизайн сайтов по фото или описанию.', advantage: 'Повторяет внешний вид по скриншоту.', limits: '5–10 бесплатных генераций в месяц.' },
+                { name: 'Replit', url: 'https://replit.com', what: 'Готовые сайты с адресом https прямо в браузере.', advantage: 'Ничего не надо устанавливать.', limits: 'Сайт «спит», лимит запросов к ИИ.' },
+                { name: 'DeepSeek', url: 'https://chat.deepseek.com', what: 'Написание кода по описанию.', advantage: 'Полностью бесплатный и умный.', limits: 'Вечером медленно из-за нагрузки.' },
+                { name: 'Gemini', url: 'https://gemini.google.com', what: 'Код для сайтов и анализ больших файлов.', advantage: 'Огромное контекстное окно.', limits: 'Бесплатно, но с ограничением скорости.' },
+                { name: 'Windsurf', url: 'https://codeium.com/windsurf', what: 'Создание сайтов и программ.', advantage: 'Видит, что вы делаете, и подсказывает шаги.', limits: '25 «премиум» запросов в месяц.' }
+            ]},
+            { id: 'copywriting', icon: '📝', title: 'Копирайтинг и редактура', description: 'Тексты, посты, описания товаров и редактура — быстро, грамотно и в нужном тоне.', details: [
+                { name: 'ChatGPT', url: 'https://chat.openai.com', what: 'Тексты любого жанра, редактура и переписывание.', advantage: 'Понимает тон и стиль.', limits: 'Бесплатная версия с лимитом.' },
+                { name: 'Claude', url: 'https://claude.ai', what: 'Длинные тексты, работа с документами.', advantage: 'Естественный стиль, меньше «воды».', limits: 'Суточный лимит сообщений.' },
+                { name: 'DeepSeek', url: 'https://chat.deepseek.com', what: 'Тексты, переводы и редактура на русском.', advantage: 'Полностью бесплатный.', limits: 'Вечером медленнее.' },
+                { name: 'Notion AI', url: 'https://www.notion.so/product/ai', what: 'Генерация текстов внутри заметок.', advantage: 'Встроен в рабочее пространство.', limits: 'Ограниченное число запросов.' },
+                { name: 'Copy.ai', url: 'https://www.copy.ai', what: 'Маркетинговые тексты и описания товаров.', advantage: 'Готовые шаблоны под маркетинг.', limits: 'Ограничение по словам/месяц.' }
+            ]},
+            { id: 'sales-crm', icon: '💼', title: 'Продажи, CRM, автоматизация', description: 'Ответы клиентам, воронки, напоминания и автоматизация рутины в продажах.', details: [
+                { name: 'ChatGPT (Zapier)', url: 'https://chat.openai.com', what: 'Ответы клиентам, скрипты продаж.', advantage: 'Работает с таблицами и формами.', limits: 'Бесплатно с лимитом.' },
+                { name: 'Tidio', url: 'https://www.tidio.com', what: 'Чат-бот для сайта: сбор заявок.', advantage: 'Готовые сценарии и ИИ-ответы.', limits: 'Бесплатный тариф с ограничением.' },
+                { name: 'ManyChat', url: 'https://manychat.com', what: 'Автоматизация переписок в мессенджерах.', advantage: 'Продажи в мессенджерах без ручной переписки.', limits: 'Лимит контактов.' },
+                { name: 'HubSpot AI', url: 'https://www.hubspot.com', what: 'CRM с ИИ: ведение клиентов и сделок.', advantage: 'Всё в одном месте.', limits: 'Базовые функции бесплатны.' },
+                { name: 'Make', url: 'https://www.make.com', what: 'Связки форм, таблиц и писем.', advantage: 'Визуальный конструктор.', limits: 'Лимит операций в месяц.' }
+            ]},
+            { id: 'data-analysis', icon: '📊', title: 'Анализ данных и таблицы', description: 'Разбор таблиц, отчёты, графики и выводы из сырых данных — без сложных формул.', details: [
+                { name: 'ChatGPT (Data Analysis)', url: 'https://chat.openai.com', what: 'Загружайте Excel/CSV — строит графики и отчёты.', advantage: 'Объясняет результаты простым языком.', limits: 'Частично на платных тарифах.' },
+                { name: 'Gemini (Google)', url: 'https://gemini.google.com', what: 'Анализ таблиц и документов.', advantage: 'Огромное контекстное окно.', limits: 'Ограничения по скорости.' },
+                { name: 'Julius AI', url: 'https://julius.ai', what: 'Визуализация и прогнозы по данным.', advantage: 'Заточен под данные и графики.', limits: 'Лимит сообщений.' },
+                { name: 'Rows AI', url: 'https://rows.com', what: 'Таблицы с ИИ и сводками.', advantage: 'Привычный интерфейс таблиц.', limits: 'Лимит ИИ-запросов.' }
+            ]},
+            { id: 'nocode', icon: '🧩', title: 'No-code / автоматизации', description: 'Связки сервисов без кода: формы → таблицы → письма, автопостинг и рутина на автопилоте.', details: [
+                { name: 'Zapier', url: 'https://zapier.com', what: 'Автоматизация связок между сервисами.', advantage: 'Огромное число интеграций.', limits: 'Лимит задач в месяц.' },
+                { name: 'Make', url: 'https://www.make.com', what: 'Визуальный конструктор сценариев.', advantage: 'Гибче и часто дешевле Zapier.', limits: 'Лимит операций.' },
+                { name: 'n8n', url: 'https://n8n.io', what: 'Автоматизация с открытым кодом.', advantage: 'Можно развернуть у себя.', limits: 'Требует хостинга.' },
+                { name: 'Airtable AI', url: 'https://www.airtable.com', what: 'Базы данных с ИИ-функциями.', advantage: 'Удобно для проектов и клиентов.', limits: 'Бесплатный тариф с лимитами.' }
+            ]},
+            { id: 'learning', icon: '🧠', title: 'Обучение и объяснение', description: 'Конспекты, объяснение сложного, подготовка к экзаменам — учёба быстрее и понятнее.', details: [
+                { name: 'ChatGPT', url: 'https://chat.openai.com', what: 'Объясняет темы, решает задачи, делает конспекты.', advantage: 'Универсальный репетитор.', limits: 'Лимит на бесплатном тарифе.' },
+                { name: 'Claude', url: 'https://claude.ai', what: 'Разбор документов и длинных текстов.', advantage: 'Хорошо структурирует информацию.', limits: 'Суточный лимит.' },
+                { name: 'NotebookLM', url: 'https://notebooklm.google.com', what: 'Загружайте файлы — делает конспекты и даже генерирует подкасты.', advantage: 'Работает только с вашими источниками, минимум галлюцинаций.', limits: 'Бесплатно с ограничениями.' },
+                { name: 'Perplexity', url: 'https://www.perplexity.ai', what: 'Поиск информации с объяснениями и ссылками на источники.', advantage: 'Всегда даёт ссылки, можно проверить факты.', limits: 'Лимит продвинутых запросов.' }
+            ]},
+            { id: 'photo', icon: '🖼️', title: 'Работа с фото', description: 'Апскейл, ретушь, замена фона и улучшение фото — для товаров, портфолио и соцсетей.', details: [
+                { name: 'Krea AI', url: 'https://krea.ai', what: 'Мощный апскейлер и улучшение качества фото.', advantage: 'Увеличивает разрешение без потери качества.', limits: 'Бесплатные ежедневные кредиты.' },
+                { name: 'Remove.bg', url: 'https://www.remove.bg', what: 'Удаление фона с фотографий в один клик.', advantage: 'Мгновенно, аккуратно и просто.', limits: 'Бесплатно только в низком разрешении.' },
+                { name: 'Photoroom', url: 'https://www.photoroom.com', what: 'Замена фона, ретушь и создание карточек товаров.', advantage: 'Готовые шаблоны для маркетплейсов и соцсетей.', limits: 'Бесплатный тариф с водяными знаками/лимитами.' },
+                { name: 'Canva AI', url: 'https://www.canva.com', what: 'Ретушь, генерация объектов и готовые макеты.', advantage: 'Всё в одном редакторе, не нужно переключаться.', limits: 'Часть ИИ-функций платная.' }
+            ]}
+        ];
+
+        const grid = document.getElementById('catalogGrid');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalBody = document.getElementById('modalBody');
+        const modalClose = document.getElementById('modalClose');
+
+        function renderCards() {
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            services.forEach((service, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.dataset.id = service.id;
+
+                card.innerHTML = `
+                    <div class="card-icon">${service.icon}</div>
+                    <h2>${service.title}</h2>
+                    <p>${service.description}</p>
+                `;
+
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(service);
+                });
+
+                grid.appendChild(card);
+            });
+
+            const soonCard = document.createElement('div');
+            soonCard.className = 'card coming-soon';
+            soonCard.style.animationDelay = `${services.length * 0.1}s`;
+            soonCard.innerHTML = `
+                <div class="card-icon">🚧</div>
+                <h2>Скоро</h2>
+                <p>В разработке · новые AI-разделы</p>
+            `;
+            grid.appendChild(soonCard);
+        }
+
+        function openModal(service) {
+            if (!service.details || !service.details.length) {
+                modalBody.innerHTML = `<div class="modal-title">${service.title}</div><p style="color:#b6c8e0;">Детали скоро появятся...</p>`;
+            } else {
+                let detailsHTML = `<div class="modal-title">${service.icon} ${service.title}</div>`;
+
+                service.details.forEach(item => {
+                    const url = item.url.startsWith('http') ? item.url : `https://${item.url}`;
+                    detailsHTML += `
+                        <div class="service-item">
+                            <h3>${item.name} <a href="${url}" target="_blank" rel="noopener noreferrer">${item.url.replace(/^https?:\/\//, '')} ↗</a></h3>
+                            <p><strong>Что делает:</strong> ${item.what}</p>
+                            <p><strong>Преимущество:</strong> ${item.advantage}</p>
+                            <span class="limit-badge">⚡ ${item.limits}</span>
+                        </div>
+                    `;
+                });
+
+                modalBody.innerHTML = detailsHTML;
+            }
+
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (modalClose) {
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        }
+
+        renderCards();
+    </script>
+</body>
+</html>
